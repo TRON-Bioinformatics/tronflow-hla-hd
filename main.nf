@@ -29,7 +29,7 @@ process HLAHD {
     memory params.memory
     tag "${name}"
     publishDir "${params.output}/${name}", mode: "copy"
-    module "bio/Bowtie2/2.3.4.1-intel-2018.02"
+    module params.bowtie2_module
 
     input:
     tuple val(name), val(fastq1), val(fastq2)
