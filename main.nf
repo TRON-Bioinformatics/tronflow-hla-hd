@@ -43,13 +43,16 @@ process HLAHD {
     # HLA-HD wants its own binaries and bowtie2 in path
     export PATH=${params.hlahd_folder}/bin/:${params.bowtie2_folder}:$PATH
 
+    zcat ${fastq1} > input_fastq1.fastq
+    zcat ${fastq2} > input_fastq2.fastq
+
     # HLA HD does not accept gzipped fastq files, unzip them first
     hlahd.sh \
         -m ${params.read_length} \
         -t ${task.cpus} \
         -f ${params.hlahd_folder}/freq_data/ \
-        <(zcat ${fastq1}) \
-        <(zcat ${fastq2}) \
+        input_fastq1.fastq \
+        input_fastq2.fastq \
         ${params.hlahd_folder}/HLA_gene.split.txt \
         ${params.hlahd_folder}/dictionary/ \
         ${name} \
@@ -60,6 +63,8 @@ process HLAHD {
 
     # deletes temp folder
     rm -rf temp
+    rm -f input_fastq1.fastq
+    rm -f input_fastq2.fastq
     """
 }
 
