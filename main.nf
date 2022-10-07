@@ -56,7 +56,7 @@ process HLAHD {
         temp
 
     # moves the final result to base folder
-    mv temp/${name}/result/*final* .
+    mv temp/**/*final* .
 
     # deletes temp folder
     rm -rf temp
