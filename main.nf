@@ -1,3 +1,16 @@
+#!/usr/bin/env nextflow
+
+nextflow.enable.dsl = 2
+
+
+def helpMessage() {
+    log.info params.help_message
+}
+
+if (params.help) {
+    helpMessage()
+    exit 0
+}
 
 // checks required inputs
 if (params.input_files) {
