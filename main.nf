@@ -43,7 +43,7 @@ process HLAHD {
 
     # HLA-HD wants its own binaries and bowtie2 in path
     export PATH=${params.hlahd_folder}/bin/:${params.bowtie2_folder}:\$PATH
-    export LD_LIBRARY_PATH="${params.ld_library_path}:\$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH=${params.ld_library_path}
 
     zcat ${fastq1} > input_fastq1.fastq
     zcat ${fastq2} > input_fastq2.fastq
