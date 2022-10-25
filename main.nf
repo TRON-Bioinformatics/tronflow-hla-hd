@@ -28,7 +28,7 @@ process HLAHD {
     cpus params.cpus
     memory params.memory
     tag "${name}"
-    publishDir "${params.output}/${name}", mode: "copy"
+    publishDir "${params.output}/${name}", mode: "copy", pattern: "*.txt"
     module params.bowtie2_module
 
     input:
@@ -61,7 +61,7 @@ process HLAHD {
         temp
 
     # moves the final result to base folder
-    mv temp/**/*final* .
+    mv temp/${name}/result/* .
 
     # deletes temp folder
     rm -rf temp
