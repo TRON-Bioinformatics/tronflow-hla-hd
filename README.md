@@ -45,6 +45,8 @@ Optional input:
     * read_length: the read length (default: 50)
     * hlahd_folder: the HLA-HD folder (default: /code/hlahd.1.2.0.1)
     * bowtie2_folder: the bowtie2 folder (default: /code/bowtie/2.3.4.3)
+    * bowtie2_module: the module to load with bowtie2
+    * ld_library_path: the value to set in LD_LIBRARY_PATH
     * cpus: the number of CPUs per sample (default: 15)
     * memory: the amount of memory per sample (default: 30g)
 
