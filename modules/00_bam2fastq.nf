@@ -16,6 +16,8 @@ process BAM2FASTQ {
 
     script:
     """
+    samtools index $bam
+
     # gets reads in the provided regions
     # only non duplicated reads
     samtools view \

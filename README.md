@@ -14,13 +14,21 @@ Nextflow (Di Tommaso, 2017) pipeline for HLA typing using HLA-HD (Kawaguchi, 201
 
 ## How to run it
 
-Prepare an input table with the FASTQs for each sample with three tab-separated columns **without a header**
+Prepare an input table with the FASTQs for each sample with three tab-separated columns **without a header** using `--input_fastqs`.
 
-| Sample name          | FASTQ1                      | FASTQ2                  |
-|----------------------|---------------------------------|------------------------------|
-| sample_1             | /path/to/sample_1.1.fq      |    /path/to/sample_1.2.fq   |
-| sample_2             | /path/to/sample_2.1.fq      |    /path/to/sample_2.2.fq  |
+| Sample name          | FASTQ1                    | FASTQ2                  |
+|----------------------|---------------------------|------------------------------|
+| sample_1             | /path/to/sample_1.1.fq.gz |    /path/to/sample_1.2.fq.gz   |
+| sample_2             | /path/to/sample_2.1.fq.gz    |    /path/to/sample_2.2.fq.gz  |
 
+Alternatively, provide a table with BAM files using `--input_bams`.
+
+| Sample name          | BAM                   |
+|----------------------|-----------------------|
+| sample_1             | /path/to/sample_1.bam |
+| sample_2             | /path/to/sample_2.bam |
+
+BAM files should be indexed.
 
 Run as indicated below.
 
@@ -34,14 +42,20 @@ Usage:
     nextflow run main.nf --input_files input_files --output output_folder
 
 Input:
-    * input_files: the path to a tab-separated values file containing in each row the sample name, FASTQ 1 and FASTQ 2
+    * input_fastqs: the path to a tab-separated values file containing in each row the sample name, FASTQ 1 and FASTQ 2
     The input file does not have header!
     Example input file:
     name1       fastq1.fq.gz    fastq2.fq.gz
     name2       fastq1.fq.gz    fastq2.fq.gz
+    * input_bams: the path to a tab-separated values file containing in each row the sample name and BAM
+    The input file does not have header!
+    Example input file:
+    name1       name1.bam
+    name2       name2.bam
     * output: output folder where results will be stored
 
 Optional input:
+    * reference: the reference genome to use (default: hg38, possible values: hg38 or hg19)
     * read_length: the read length (default: 50)
     * hlahd_folder: the HLA-HD folder (default: /code/hlahd.1.2.0.1)
     * bowtie2_folder: the bowtie2 folder (default: /code/bowtie/2.3.4.3)
@@ -49,7 +63,6 @@ Optional input:
     * ld_library_path: the value to set in LD_LIBRARY_PATH
     * cpus: the number of CPUs per sample (default: 15)
     * memory: the amount of memory per sample (default: 30g)
-
 ```
 
 
