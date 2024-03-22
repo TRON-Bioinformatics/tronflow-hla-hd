@@ -3,8 +3,9 @@
 /workspace.xml
 work
 .nextflow.log*
-report.html
-timeline.html
+report.html*
+timeline.html*
+trace.txt*
 trace.txt
 dag.dot
 .nextflow
