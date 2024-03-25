@@ -1,0 +1,2 @@
+TESTX_S1_L001	./test_data/TESTX_S1_L001_R1_001.fastq.gz	./test_data/TESTX_S1_L001_R2_001.fastq.gz
+TESTX_S1_L002	./test_data/TESTX_S1_L002_R1_001.fastq.gz	./test_data/TESTX_S1_L002_R2_001.fastq.gz

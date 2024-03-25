@@ -2,6 +2,9 @@
 
 nextflow.enable.dsl = 2
 
+include { BAM2FASTQ } from './modules/00_bam2fastq'
+include { HLAHD } from './modules/01_hlahd'
+
 
 def helpMessage() {
     log.info params.help_message
@@ -13,63 +16,42 @@ if (params.help) {
 }
 
 // checks required inputs
-if (params.input_files) {
+if (params.input_fastqs) {
   Channel
-    .fromPath(params.input_files)
+    .fromPath(params.input_fastqs)
     .splitCsv(header: ['name', 'fastq1', 'fastq2'], sep: "\t")
     .map{ row-> tuple(row.name, file(row.fastq1), file(row.fastq2)) }
-    .set { input_files }
+    .set { input_fastqs }
+} else if (params.input_bams) {
+  Channel
+    .fromPath(params.input_bams)
+    .splitCsv(header: ['name', 'bam'], sep: "\t")
+    .map{ row-> tuple(row.name, file(row.bam)) }
+    .set { input_bams }
 } else {
-  exit 1, "Input file not specified!"
+  exit 1, "Provide either --input_fastqs or --input_bams"
 }
 
 
-process HLAHD {
-    cpus params.cpus
-    memory params.memory
-    tag "${name}"
-    publishDir "${params.output}/${name}", mode: "copy", pattern: "*.txt"
-    module params.bowtie2_module
-
-    input:
-    tuple val(name), val(fastq1), val(fastq2)
-
-    output:
-    tuple val("${name}"), path("*final*")
-
-    script:
-    """
-    mkdir temp
-
-    # HLA-HD wants its own binaries and bowtie2 in path
-    export PATH=${params.hlahd_folder}/bin/:${params.bowtie2_folder}:\$PATH
-    export LD_LIBRARY_PATH=${params.ld_library_path}
-
-    zcat ${fastq1} > input_fastq1.fastq
-    zcat ${fastq2} > input_fastq2.fastq
-
-    # HLA HD does not accept gzipped fastq files, unzip them first
-    hlahd.sh \
-        -m ${params.read_length} \
-        -t ${task.cpus} \
-        -f ${params.hlahd_folder}/freq_data/ \
-        input_fastq1.fastq \
-        input_fastq2.fastq \
-        ${params.hlahd_folder}/HLA_gene.split.txt \
-        ${params.hlahd_folder}/dictionary/ \
-        ${name} \
-        temp
-
-    # moves the final result to base folder
-    mv temp/${name}/result/* .
-
-    # deletes temp folder
-    rm -rf temp
-    rm -f input_fastq1.fastq
-    rm -f input_fastq2.fastq
-    """
+if (params.reference == 'hg38') {
+    contigs = "$baseDir/references/contigs_hla_reads_hg38.bed"
 }
+else if (params.reference == 'hg19') {
+    contigs = "$baseDir/references/contigs_hla_reads_hg19.bed"
+}
+else {
+    log.error "--reference only supports hg38 or hg19"
+    exit 1
+}
+
+
 
 workflow {
-    HLAHD(input_files)
+
+    if (input_bams) {
+        BAM2FASTQ(input_bams, contigs)
+        input_fastqs =BAM2FASTQ.out
+    }
+
+    HLAHD(input_fastqs)
 }
