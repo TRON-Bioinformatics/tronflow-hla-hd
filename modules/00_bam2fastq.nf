@@ -5,7 +5,7 @@ process BAM2FASTQ {
     publishDir "${params.output}/${name}", mode: "copy", pattern: "*.txt"
     module params.bowtie2_module
 
-    conda (params.enable_conda ? "bioconda::samtools=1.18 bioconda::gatk4=4.2.5.0" : null)
+    conda (params.enable_conda ? "bioconda::samtools=1.18 bioconda::bedtools=2.31.1" : null)
 
     input:
     tuple val(name), val(bam)
@@ -31,12 +31,21 @@ process BAM2FASTQ {
 
     #Merge bam files
     samtools merge -o ${name}.merge.bam ${name}.unmap.bam ${name}.mhc.bam
+    rm -f ${name}.unmap.bam
+    rm -f ${name}.mhc.bam
+
+    # sort BAM by read name
+    samtools sort -n ${name}.merge.bam -o ${name}.merge.sorted.bam
+    rm -f ${name}.merge.bam
 
     #Create fastq
-    gatk SamToFastq --VALIDATION_STRINGENCY SILENT -I ${name}.merge.bam -F ${name}.hlatmp.1.fastq -F2 ${name}.hlatmp.2.fastq
+    bedtools bamtofastq -i ${name}.merge.sorted.bam -fq ${name}.hlatmp.1.fastq -fq2 ${name}.hlatmp.2.fastq
 
     #Change fastq ID
     cat ${name}.hlatmp.1.fastq |awk '{if(NR%4 == 1){O=\$0;gsub("/1"," 1",O);print O}else{print \$0}}' | gzip > ${name}.hla.1.fastq.gz
     cat ${name}.hlatmp.2.fastq |awk '{if(NR%4 == 1){O=\$0;gsub("/2"," 2",O);print O}else{print \$0}}' | gzip > ${name}.hla.2.fastq.gz
+
+    rm -f ${name}.hlatmp.1.fastq
+    rm -f ${name}.hlatmp.2.fastq
     """
 }
