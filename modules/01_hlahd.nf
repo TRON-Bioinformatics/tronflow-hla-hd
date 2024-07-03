@@ -3,7 +3,8 @@ process HLAHD {
     memory params.memory
     tag "${name}"
     publishDir "${params.output}/${name}", mode: "copy", pattern: "*.txt"
-    module params.bowtie2_module
+
+    conda (params.enable_conda ? "bioconda::bowtie=2.5.3" : null)
 
     input:
     tuple val(name), val(fastq1), val(fastq2)
@@ -16,7 +17,7 @@ process HLAHD {
     mkdir temp
 
     # HLA-HD wants its own binaries and bowtie2 in path
-    export PATH=${params.hlahd_folder}/bin/:${params.bowtie2_folder}:\$PATH
+    export PATH=${params.hlahd_folder}/bin/:\$PATH
     export LD_LIBRARY_PATH=${params.ld_library_path}
 
     zcat ${fastq1} > input_fastq1.fastq
